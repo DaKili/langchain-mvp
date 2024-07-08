@@ -93,3 +93,40 @@ def generate_reading_list(name, bullet_points, text_format):
     print_cost(name, response.usage)
     result = response.choices[0].text.strip()
     return result
+
+    # results = result.strip('\n\n').split('\n\n')
+
+    # # Risky and temporary extraction of parts of the response. There is no guarantee that gpt prepends the lines with a descriptor. Also the order could be different if it wanted.
+    # return Module(
+    #     name,
+    #     intended_learning_outcomes_en = results[0].split(':', 1)[1],
+    #     recommended_prerequisites_en = results[1].split(':', 1)[1],
+    #     content_en = results[2].split(':', 1)[1],
+    #     teaching_and_learning_methods_en = results[3].split(':', 1)[1],
+    #     media_en = results[4].split(':', 1)[1],
+    #     reading_list_en = results[5] .split(':', 1)[1],
+    #     description_bullet_points_en = bullet_points
+    # )
+
+def obsolete_generate_module_from_bullet_points(name, bullet_points, messages):
+    # client = ChatOpenAI(model="gpt-3.5-turbo") # This yields worse results than the normal OpenAI API, even though langchain recommends it.
+    # client = OpenAI(model="gpt-3.5-turbo-instruct") # Instruct seems more reliable, consistent and follows instructions more directly. The returned object lacks information though.
+    client = ChatOpenAI(model="gpt-3.5-turbo")
+    parser = StrOutputParser()
+    # client = ChatOpenAI(model="gpt-3.5-turbo")
+    
+    # Individual messages consume way more tokens, not necessarily improving responses. They tend to get overly long and elaborate. They also take way more time than wrapping everything in one message.
+    messages = [
+        SystemMessage(content=f"{persona} {bullet_points}. Prepend every description with '<description name>:'"),
+        HumanMessage(content=f"Based on these ideas, write a brief (max. 50 words, preferably less) free text (no list) of the intendes learning outcomes for that module."),
+        HumanMessage(content=f"write a brief free text (NO LIST) of the recommended prerequisites for that module."),
+        HumanMessage(content=f"write a brief free text (NO LIST) of the content for that module."),
+        HumanMessage(content=f"write a brief free text (NO LIST) of the teaching and learning methods for that module."),
+        HumanMessage(content=f"write a brief free text (NO LIST) of the media of that module."),
+        HumanMessage(content=f"write a brief free text (NO LIST) of the reading list for that module. Max 3 books, preferably less.")
+    ]
+    print("tokens_from_messages: " + str(client.get_num_tokens_from_messages(messages)))
+    # chain = client | parser
+    result = client.invoke(messages)
+    # result = chain.invoke(messages)
+    print(result + "\n")
