@@ -5,7 +5,7 @@ Prototype MVP for my upcoming masters thesis. It currently generates module desc
 ## Usage
 Disclaimer: these instructions have not been tested yet. #todo
 - create and activate venv
-- install requirements `pip install requirements.txt`
+- install requirements `pip install -r requirements.txt`
 - add `OPENAI_API_KEY = "<your-key>"` to a new `.env` file
 - run `langchain-mvp.py`
 
